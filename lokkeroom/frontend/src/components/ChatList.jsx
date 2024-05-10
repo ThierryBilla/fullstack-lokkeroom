@@ -1,10 +1,13 @@
 // ChatList.jsx
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
 import Modal from './Modal';
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext';
+
 
 function ChatList({ onLobbySelect, onUserSelect }) {
     const [conversations, setConversations] = useState([]);
@@ -12,18 +15,29 @@ function ChatList({ onLobbySelect, onUserSelect }) {
     const [showDmModal, setShowDmModal] = useState(false);
     const [recipientNickname, setRecipientNickname] = useState('');
     const [message, setMessage] = useState('');
+    const { logout } = useAuth();
+    const navigate = useNavigate();
+    const localToken = localStorage.getItem('token')
+  
 
     useEffect(() => {
-        fetchConversations();
-    }, []);
+        if(localToken) {
+            fetchConversations();
+            console.log("hello token")
+        } else {
+            alert("prob with token")
+        }
+        
+    }, [localToken]);
+
 
     const fetchConversations = async () => {
         try {
             const lobbiesResponse = await axios.get('/api/user/lobbies', {
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` }
             });
             const lobbies = lobbiesResponse.data;
-
+            console.log(lobbies);
             const dmResponse = await axios.get('/api/direct-messages', {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
             });
@@ -46,6 +60,7 @@ function ChatList({ onLobbySelect, onUserSelect }) {
         }
     };
 
+
     const handleCreateLobby = async () => {
         const lobbyName = prompt("Please enter the name for the new lobby:");
         if (!lobbyName) return;
@@ -60,6 +75,7 @@ function ChatList({ onLobbySelect, onUserSelect }) {
             console.error('Failed to create lobby:', error);
         }
     };
+
 
     const handleSendDM = async () => {
         if (!recipientNickname || !message) {
@@ -94,8 +110,6 @@ function ChatList({ onLobbySelect, onUserSelect }) {
     };
 
 
-    
-
     const handleJoinLobby = async () => {
         const lobbyId = prompt("Please enter the Lobby ID you want to join:");
         if (!lobbyId) return;
@@ -112,6 +126,16 @@ function ChatList({ onLobbySelect, onUserSelect }) {
             alert(error.response?.data?.error || 'Failed to join the lobby');
         }
     };
+
+   /*  const logout = () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("userId");
+        setUser(null); // Réinitialiser l'état de l'utilisateur
+        setIsAdmin(false); // Réinitialiser le statut d'administrateur
+        console.log('User logged out successfully');
+        navigate('/login');
+    } */
+
 
     return (
         <div className="chat-list">
@@ -136,6 +160,7 @@ function ChatList({ onLobbySelect, onUserSelect }) {
                     <div className="chat-preview">{conv.partnerName ? `Last message with ${conv.partnerName}` : "Last message preview here"}</div>
                 </div>
             ))}
+                <button className="logout-button" onClick={logout}>Logout</button>
 
                 <Modal show={showDmModal} onClose={() => setShowDmModal(false)}>
                     <h2>Send Direct Message</h2>
@@ -155,7 +180,6 @@ function ChatList({ onLobbySelect, onUserSelect }) {
                         <button className="close-button" onClick={() => setShowDmModal(false)}>Close</button>
                     </div>
                 </Modal>
-
         </div>
     );
 }
