@@ -16,14 +16,17 @@ export const AuthProvider = ({ children }) => {
             const response = await axios.post('http://localhost:3000/api/login', userCredentials);
             if (response.data.accessToken && response.data.id) {
                 const { accessToken, id, name, admin } = response.data;
+                
+                setUser({ id, name, accessToken });
+                setIsAdmin(admin);
     
                 localStorage.setItem('token', accessToken);
                 localStorage.setItem('userId', id.toString());
                 console.log('User ID set in localStorage:', id);
     
-                setUser({ id, name });
+               /*  setUser({ id, name, accessToken });
                 setIsAdmin(admin);
-    
+     */
                 console.log('Login successful:', { id, name, accessToken, admin });
                 return true;
             } else {
@@ -38,16 +41,15 @@ export const AuthProvider = ({ children }) => {
         }
     }, []);
     
-    
-    
-    
 
     const logout = useCallback(() => {
         localStorage.removeItem('token'); // Nettoyer le token stocké lors de la déconnexion
+        localStorage.removeItem('userId'); // Nettoyer le userId stocké lors de la déconnexion
         setUser(null); // Réinitialiser l'état de l'utilisateur
         setIsAdmin(false); // Réinitialiser le statut d'administrateur
         console.log('User logged out successfully');
     }, []);
+
 
     return (
         <AuthContext.Provider value={{ user, isAdmin, login, logout }}>
