@@ -1,5 +1,6 @@
+// Modal.jsx
 import React from 'react';
-import './Modal.css'; 
+import './Modal.css';
 
 function Modal({ show, onClose, children }) {
     if (!show) {
@@ -11,7 +12,7 @@ function Modal({ show, onClose, children }) {
             <div className="modal-content" onClick={e => e.stopPropagation()}>
                 {children}
                 <div className="modal-footer">
-                    <button className="close-button" onClick={onClose}>Close</button>
+                    <button onClick={onClose}>Close</button>
                 </div>
             </div>
         </div>

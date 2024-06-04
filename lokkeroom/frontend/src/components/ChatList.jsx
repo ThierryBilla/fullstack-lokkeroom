@@ -152,9 +152,10 @@ function ChatList({ onLobbySelect, onUserSelect }) {
                     />
                     <div className="modal-footer"> 
                         <button onClick={handleSendDM}>Send Message</button>
-                        <button className="close-button" onClick={() => setShowDmModal(false)}>Close</button>
                     </div>
                 </Modal>
+
+
 
         </div>
     );
