@@ -13,12 +13,15 @@ import './index.css';
 axios.defaults.baseURL = 'http://localhost:3000';
 
 function App() {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, } = useAuth();
   const [selectedConversation, setSelectedConversation] = useState(null);
+  const localToken = localStorage.getItem('token')
+
 
   const handleConversationSelect = (conversation) => {
     setSelectedConversation(conversation);  // Set the entire conversation object which includes type and id
   };
+
 
   return (
     <Router>
@@ -26,7 +29,7 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/" element={user ? (
+          <Route path="/" element={ localToken ? (
             <>
               <ChatList onLobbySelect={handleConversationSelect} onUserSelect={handleConversationSelect} />
               <ChatWindow selectedItem={selectedConversation} isAdmin={isAdmin} />
